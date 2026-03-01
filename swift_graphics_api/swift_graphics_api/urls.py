@@ -17,10 +17,29 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
-dfrom django.conf.urls.static import static
+from django.conf.urls.static import static
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view(['GET'])
+def api_root(request):
+	return Response({
+		'message': 'Welcome to Swift Graphics API',
+		'version': '1.0',
+		'endpoints': {
+			'admin': '/admin/',
+			'register': '/api/auth/register/',
+			'login': '/api/auth/login/',
+			'profile': '/api/auth/profile/',
+			'services': '/api/services/',
+			'orders': '/api/orders/',
+			'dashboard': '/api/dashboard/',
+		}
+	})
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('core.urls')),
+	path('', api_root, name='api-root'),
+	path('admin/', admin.site.urls),
+	path('api/', include('core.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

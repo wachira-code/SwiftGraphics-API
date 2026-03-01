@@ -33,7 +33,7 @@ class LoginSerializer(serializers.ModelSerializer):
 	password = serializers.CharField(write_only=True)
 	
 class UserProfileSerializer(serializers.ModelSerializer):
-	total_orders = serializers/SerializerMethodField()
+	total_orders = serializers.SerializerMethodField()
 	
 	class Meta:
 		model = User
@@ -41,12 +41,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		read_only_fields = ['date_joined']
 		
 	def get_total_orders(self, obj):
-		eturn obj.orders.count()
+		return obj.orders.count()
 		
 class ChangePasswordSerializer(serializers.Serializer):
 	old_password = serializers.CharField(write_only=True)
 	new_password = serializers.CharField(write_only=True, min_length=8)
-	confirm_new_password = serializers.Charfield(write_only=True)
+	confirm_new_password = serializers.CharField(write_only=True)
 	
 	def validate(self, data):
 		if data['new_password'] != data['confirm_new_password']:

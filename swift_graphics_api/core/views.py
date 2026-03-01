@@ -8,19 +8,23 @@ from django.contrib.auth import authenticate, get_user_model
 from django.shortcuts import get_object_or_404
 from .models import Service, Order, BusinessCardDesign, EulogyDocument
 from .serializers import (
-    ServiceSerializer, OrderSerializer,
-    BusinessCardDesignSerializer, EulogyDocumentSerializer,
-    RegisterSerializer, LoginSerializer, UserProfileSerializer, ChangePasswordSerializer
+	ServiceSerializer, OrderSerializer,
+	BusinessCardDesignSerializer, EulogyDocumentSerializer,
+	RegisterSerializer, LoginSerializer, UserProfileSerializer, ChangePasswordSerializer
 )
 
 User = get_user_model()
 
+class StandardPagination(PageNumberPagination):
+	page_sie = 10
+	page_size_query_param = 'page_size'
+	max_page_size = 100
+	
 class IsAdminOrReadOnly(permissions.BasePermission):
-    """Only admins can create/edit services."""
-    def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        return request.user and request.user.is_staff
+	def has_permission(self, request, view):
+		if request.method in permissions.SAFE_METHODS:
+			return True
+		return request.user and request.user.is_staff
 
 class RegisterView(generics.GenericAPIView):
 	serializer_class = RegisterSerializer
@@ -33,7 +37,7 @@ class RegisterView(generics.GenericAPIView):
 			token = Token.objects.get(user=user)
 			return Response({
 				'token': token.key,
-				'user': {'id': user.id, 'username': user.username 'email': user.email}
+				'user': {'id': user.id, 'username': user.username, 'email': user.email}
 			},
 				status=status.HTTP_201_CREATED)
 		return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -80,7 +84,7 @@ class UserProfileView(generics.GenericAPIView):
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 		
-class ChangePasswordViw(generics.GenericAPIView):
+class ChangePasswordView(generics.GenericAPIView):
 	serializer_class = ChangePasswordSerializer
 	permission_classes = [permissions.IsAuthenticated]
 	
@@ -151,43 +155,42 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 	def destroy(self, request, *args, **kwargs):
 		order = self.get_object()
-        	if order.status not in ['pending']:
-            		return Response(
-                		{'error': 'Only pending orders can be cancelled.'},
-                		status=status.HTTP_400_BAD_REQUEST
-            		)
+		if order.status not in ['pending']:
+			return Response(
+				{'error': 'Only pending orders can be cancelled.'},
+				status=status.HTTP_400_BAD_REQUEST
+			)
 		order.status = 'cancelled'
-        	order.save()
-        	return Response(
-            		{'message': f'Order #{order.id} cancelled successfully.'},
-            		status=status.HTTP_200_OK
-        	)
-
+		order.save()
+		return Response(
+			{'message': f'Order #{order.id} cancelled successfully.'},
+			status=status.HTTP_200_OK
+		)
 
 class OrderStatusUpdateView(generics.UpdateAPIView):
-	    queryset = Order.objects.all()
-	    serializer_class = OrderSerializer
-	    permission_classes = [permissions.IsAdminUser]
+	queryset = Order.objects.all()
+	serializer_class = OrderSerializer
+	permission_classes = [permissions.IsAdminUser]
 
-	    def patch(self, request, *args, **kwargs):
+	def patch(self, request, *args, **kwargs):
 		order = self.get_object()
 		new_status = request.data.get('status')
 		valid_statuses = ['pending', 'processing', 'completed', 'cancelled']
 
 		if new_status not in valid_statuses:
-		    return Response(
-		        {'error': f'Invalid status. Choose from {valid_statuses}'},
-		        status=status.HTTP_400_BAD_REQUEST
-		    )
+			return Response(
+				{'error': f'Invalid status. Choose from {valid_statuses}'},
+				status=status.HTTP_400_BAD_REQUEST
+			)
 
 		order.status = new_status
 		order.save()
 		return Response(
-		    {
-		        'message': f'Order #{order.id} status updated to {new_status}.',
-		        'order': OrderSerializer(order).data
-		    },
-		    status=status.HTTP_200_OK
+			{
+				'message': f'Order #{order.id} status updated to {new_status}.',
+				'order': OrderSerializer(order).data
+			},
+			status=status.HTTP_200_OK
 		)
 
 
@@ -196,19 +199,18 @@ class BusinessCardListCreateView(generics.ListCreateAPIView):
 	permission_classes = [permissions.IsAuthenticated]
 	pagination_class = StandardPagination
 
-    	def get_queryset(self):
-        	return BusinessCardDesign.objects.filter(
-            		order__customer=self.request.user
-        	).order_by('-id')
+	def get_queryset(self):
+		return BusinessCardDesign.objects.filter(
+			order__customer=self.request.user
+		).order_by('-id')
 
-    	def perform_create(self, serializer):
-        	order = get_object_or_404(
+	def perform_create(self, serializer):
+		order = get_object_or_404(
 			Order,
-            		pk=self.kwargs['order_id'],
-            		customer=self.request.user
-        	)
-        	serializer.save(order=order)
-
+			pk=self.kwargs['order_id'],
+			customer=self.request.user
+		)
+		serializer.save(order=order)
 
 class BusinessCardDetailView(generics.RetrieveUpdateDestroyAPIView):
 	serializer_class = BusinessCardDesignSerializer
