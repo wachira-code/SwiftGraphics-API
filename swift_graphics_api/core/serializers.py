@@ -39,7 +39,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	
 	class Meta:
 		model = User
-		fields = ['id', 'usernamr', 'email', 'first_name', 'last_name', 'date_joined', 'total_orders']
+		fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined', 'total_orders']
 		read_only_fields = ['date_joined']
 		
 	def get_total_orders(self, obj):
