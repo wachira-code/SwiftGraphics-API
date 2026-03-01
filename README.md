@@ -97,4 +97,55 @@ This API uses Token-based Authentication
 
 1.**Services**
 
+GET- list all services, search services, filter by type, get single service
+
+POST- create service
+
+PUT- update service
+
+PATCH- partial update
+
+DELETE- delete service
+
+2.**Orders**
+
+GET- list my orders, filter by status, get single order
+
+POST- create order
+
+PUT- update order
+
+DELETE- cancel order
+
+Patch- update order status
+
+3.**Business Card Designs**
+
+GET- list designs, get single design
+
+POST- create business card design
+
+PUT- update design
+
+PATCH- partial update
+
+DELETE- delete design
+
+4.**Eulogy Document**
+
+GET- list eulogies, get single eulogy
+
+POST- create eulogy
+
+PATCH- partial update
+
+PUT- update eulogy
+
+DELETE- delete eulogy
+
+
+
+
+
+
 
