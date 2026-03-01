@@ -87,9 +87,14 @@ swift_graphics_api/
 
 This API uses Token-based Authentication
 
-How it works
+**How it works**
 
 1. Register or login to receive token
 
 2. Include the token in the Authorization header for all protected requests
+
+**API ENDPOINTS**
+
+1.**Services**
+
 
