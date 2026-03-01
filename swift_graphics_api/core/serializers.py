@@ -28,9 +28,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 		Token.objects.create(user=user)
 		return user
 		
-class LoginSerializer(serializers.ModelSerializer):
+class LoginSerializer(serializers.Serializer):
 	username = serializers.CharField()
 	password = serializers.CharField(write_only=True)
+	
+	
 	
 class UserProfileSerializer(serializers.ModelSerializer):
 	total_orders = serializers.SerializerMethodField()
